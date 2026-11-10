@@ -31,7 +31,7 @@ public class Cliente {
     @Column(unique = true, nullable = false, length = 10)
     private String nif; // Nuevo campo para el NIF/DNI con restricción de unicidad en base de datos
 
-    @NotBlank(message = "El teléfono es obligatorio")
+    @NotBlank(message = "El teléfono es obligatorio") //caulquiercosa
     @Pattern(regexp = "^\\+?[0-9. ()-]{7,25}$", message = "El formato del teléfono no es válido") //[0-9. ()-] = permite números del 0 al 9 puntos parentesis y guiones
     private String telefono; // Vital para la futura integración con WhatsApp
 
