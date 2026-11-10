@@ -23,6 +23,15 @@ public class Cliente {
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
 
+    @NotBlank(message = "Los apellidos son obligatorio")
+    private String apellidos;
+
+    @NotBlank(message = "El NIF/DNI/NIE es obligatorio")
+    @Pattern(regexp = "^[0-9]{8}[A-Za-z]|[XYZ][0-9]{7}[A-Za-z]$", message = "El formato del NIF/DNI no es válido (Ej: 12345678A o X1234567Z)")
+    @Column(unique = true, nullable = false, length = 10)
+    private String nif; // Nuevo campo para el NIF/DNI con restricción de unicidad en base de datos
+
+
     @NotBlank(message = "El teléfono es obligatorio")
     @Pattern(regexp = "^\\+?[0-9. ()-]{7,25}$", message = "El formato del teléfono no es válido") //[0-9. ()-] = permite números del 0 al 9 puntos parentesis y guiones
     private String telefono; // Vital para la futura integración con WhatsApp
