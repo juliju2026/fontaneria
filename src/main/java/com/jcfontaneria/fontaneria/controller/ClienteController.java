@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -20,8 +21,10 @@ public class ClienteController {
 
     // Listar todos los clientes
     @GetMapping
-    public String listarClientes(Model model) {
-        model.addAttribute("clientes", clienteService.listarClientes());
+    public String listarClientes(@RequestParam(value = "filtro", required = false) String filtro, Model model) {
+        List<Cliente> clientes = clienteService.buscarClientes(filtro);
+        model.addAttribute("clientes", clientes);
+        model.addAttribute("filtro", filtro); // Para mantener el texto escrito en la caja de búsqueda
         return "clientes/lista-clientes"; // Apunta a la vista HTML en templates/clientes/lista-clientes.html
     }
 
@@ -55,6 +58,16 @@ public class ClienteController {
 
         clienteService.guardarCliente(cliente);
         return "redirect:/clientes";
+    }
+
+    // Mostrar formulario precargado para editar un cliente existente
+    @GetMapping("/editar/{id}")
+    public String mostrarFormularioEditar(@PathVariable Long id, Model model) {
+        Cliente cliente = clienteService.buscarPorId(id)
+                .orElseThrow(() -> new IllegalArgumentException("ID de cliente no válido: " + id));
+
+        model.addAttribute("cliente", cliente);
+        return "clientes/form-cliente";
     }
 
     // Eliminar un cliente por su ID

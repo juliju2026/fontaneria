@@ -28,7 +28,12 @@ public class ClienteService {
 
     public Optional<Cliente> buscarPorNif(String nif) { return clienteRepository.findByNif(nif);
     }
-
+    public List<Cliente> buscarClientes(String filtro) {
+        if (filtro != null && !filtro.trim().isEmpty()) {
+            return clienteRepository.findByNombreCompletoContainingIgnoreCase(filtro);
+        }
+        return clienteRepository.findAll(); // Si está vacío, devuelve el listado completo
+    }
     public void eliminarCliente(Long id) {
         clienteRepository.deleteById(id);
     }
