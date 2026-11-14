@@ -1,12 +1,9 @@
 package com.jcfontaneria.fontaneria.entity;
 
-public enum EstadoServicio {
-        PENDIENTE,
-        PRESUPUESTADO,
-        ACEPTADO,
+public enum EstadoOperativo {
+        PENDIENTE_ASIGNACION,
+        ASIGNADO,
         EN_PROCESO,
         FINALIZADO,
-        PENDIENTE_PAGO,
-        PAGADO,
         CANCELADO
 }
