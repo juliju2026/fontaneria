@@ -14,7 +14,10 @@ public class ClienteService {
     @Autowired
     private ClienteRepository clienteRepository;
 
-    public List<Cliente> listarClientes() {
+    public List<Cliente> listarClientes(String filtro) {
+        if (filtro != null && !filtro.trim().isEmpty()) {
+            return clienteRepository.findByNombreCompletoContainingIgnoreCase(filtro);
+        }
         return clienteRepository.findAll();
     }
 

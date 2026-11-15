@@ -2,6 +2,7 @@ package com.jcfontaneria.fontaneria.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,12 +29,13 @@ public class ServicioAveria {
     @NotBlank(message = "El nombre de la persona de contacto es obligatoria")
     private String nombreContacto;
 
-    @NotBlank(message = "El tel{efono de la persona de contacto es obligatoria")
+    @NotBlank(message = "El teléfono de la persona de contacto es obligatoria")
     private String telefonoContacto;
 
     //TODO a futuro agregar un campo para adjuntar imagenes o vídeos de la avería
 
     // Relación con el tipo de avería (categoria). Un servicio puede tener varios tipos de averias. La relacion es N M
+    @NotEmpty(message = "Debe seleccionar al menos una categoría para la avería")
     @ManyToMany
     @JoinTable(
             name= "averia_categoria",
@@ -50,7 +52,7 @@ public class ServicioAveria {
 
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 }
