@@ -51,7 +51,7 @@
                         <!-- Dirección del servicio -->
                         <div class="mb-3">
                             <label for="direccionServicio" class="form-label">Dirección del Servicio</label>
-                            <input type="text" id="direccionServicio" th:field="*{direccionServicio}" class="form-control" required placeholder="Dirección exacta de la avería.">
+                            <input type="text" id="direccionServicio" th:field="*{direccionServicio}" class="form-control fw-bold" placeholder="Dirección exacta de la avería." oninput="this.classList.toggle('fw-bold',this.value==='')" required>
                             <div class="text-danger small" th:if="${#fields.hasErrors('direccionServicio')}" th:errors="*{direccionServicio}"></div>
                         </div>
 
@@ -60,12 +60,12 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="nombreContacto" class="form-label">Persona de Contacto</label>
-                                <input type="text" id="nombreContacto" th:field="*{nombreContacto}" class="form-control" required placeholder="Nombre de persona de contacto en el lugar de la avería">
+                                <input type="text" id="nombreContacto" th:field="*{nombreContacto}" class="form-control fw-bold" placeholder="Nombre de persona de contacto en el lugar." oninput="this.classList.toggle('fw-bold',this.value==='')" required>
                                 <div class="text-danger small" th:if="${#fields.hasErrors('nombreContacto')}" th:errors="*{nombreContacto}"></div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="telefonoContacto" class="form-label">Teléfono de Contacto</label>
-                                <input type="text" id="telefonoContacto" th:field="*{telefonoContacto}" class="form-control" required placeholder="Teléfono de contacto de la persona, en el lugar de la avería.">
+                                <input type="text" id="telefonoContacto" th:field="*{telefonoContacto}" class="form-control fw-bold" placeholder="Teléfono de contacto de la persona en el lugar." oninput="this.classList.toggle('fw-bold',this.value==='')" required>
                                 <div class="text-danger small" th:if="${#fields.hasErrors('telefonoContacto')}" th:errors="*{telefonoContacto}"></div>
                             </div>
                         </div>
@@ -108,53 +108,67 @@
 
 <!-- Script para autocompletar campos con informacion del cliente -->
 <script>
-    const clienteSelect = document.getElementById('clienteSelect');
-    const checkboxDatosCliente = document.getElementById('usarDatosCliente');
-    const inputNombreContacto = document.getElementById('nombreContacto');
-    const inputTelefonoContacto = document.getElementById('telefonoContacto');
-    const inputDireccionServicio = document.getElementById('direccionServicio');
+    document.addEventListener("DOMContentLoaded", function() {
+        const clienteSelect = document.getElementById('clienteSelect');
+        const checkboxDatosCliente = document.getElementById('usarDatosCliente');
+        const inputNombreContacto = document.getElementById('nombreContacto');
+        const inputTelefonoContacto = document.getElementById('telefonoContacto');
+        const inputDireccionServicio = document.getElementById('direccionServicio');
 
-    function cargarDatosCliente() {
-        const clienteId = clienteSelect.value;
+        function cargarDatosCliente() {
+            if (!clienteSelect || !checkboxDatosCliente) return;
 
-        // Si no hay cliente seleccionado o el checkbox no está marcado, no hacemos nada
-        if (!clienteId || !checkboxDatosCliente.checked) {
-            return;
+            const clienteId = clienteSelect.value;
+
+            // Si no hay cliente seleccionado o el checkbox no está marcado, no hacemos nada
+            if (!clienteId || !checkboxDatosCliente.checked) {
+                return;
+            }
+
+            // Realizamos la petición al endpoint JSON del cliente
+            fetch(`/clientes/api/${clienteId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('No se pudo obtener el cliente');
+                    return response.json();
+                })
+                .then(data => {
+                    // Rellenamos los campos si tienen valor y existen en el DOM
+                    if (data.nombreCompleto && inputNombreContacto) {
+                        inputNombreContacto.value = data.nombreCompleto;
+                    }
+                    if (data.telefono && inputTelefonoContacto) {
+                        inputTelefonoContacto.value = data.telefono;
+                    }
+                    if (data.direccion && inputDireccionServicio) {
+                        inputDireccionServicio.value = data.direccion;
+                    }
+                })
+                .catch(error => console.error('Error al cargar los datos del cliente:', error));
         }
 
-        // Realizamos la petición al endpoint JSON del cliente
-        fetch(`/clientes/api/${clienteId}`)
-            .then(response => {
-                if (!response.ok) throw new Error('No se pudo obtener el cliente');
-                return response.json();
-            })
-            .then(data => {
-                // Rellenamos los campos con la información obtenida del cliente
-                if (data.nombreCompleto && inputNombreContacto) {
-                    inputNombreContacto.value = data.nombreCompleto;
-                }
-                if (data.telefono && inputTelefonoContacto) {
-                    inputTelefonoContacto.value = data.telefono;
-                }
-                if (data.direccion && inputDireccionServicio) {
-                    inputDireccionServicio.value = data.direccion;
-                }
-            })
-            .catch(error => console.error('Error al cargar los datos del cliente:', error));
-    }
-
-    // Evento 1: Cuando cambia la selección del cliente en el desplegable
-    clienteSelect.addEventListener('change', cargarDatosCliente);
-
-    // Evento 2: Cuando el usuario marca o desmarca el checkbox
-    checkboxDatosCliente.addEventListener('change', function() {
-        if (this.checked) {
+        // 1. COMPROBACIÓN INICIAL: Si entramos con un cliente ya preseleccionado (ej. desde el histórico)
+        // y el checkbox está marcado por defecto, cargamos los datos automáticamente al abrir la página.
+        if (clienteSelect && clienteSelect.value) {
             cargarDatosCliente();
-        } else {
-            // Si desmarca la casilla, limpiamos los campos para que pueda escribir otros datos
-            if (inputNombreContacto) inputNombreContacto.value = '';
-            if (inputTelefonoContacto) inputTelefonoContacto.value = '';
-            if (inputDireccionServicio) inputDireccionServicio.value = '';
+        }
+
+        // 2. EVENTO: Cuando cambia la selección del cliente en el desplegable
+        if (clienteSelect) {
+            clienteSelect.addEventListener('change', cargarDatosCliente);
+        }
+
+        // 3. EVENTO: Cuando el usuario marca o desmarca el checkbox
+        if (checkboxDatosCliente) {
+            checkboxDatosCliente.addEventListener('change', function() {
+                if (this.checked) {
+                    cargarDatosCliente();
+                } else {
+                    // Si desmarca la casilla, limpiamos los campos
+                    if (inputNombreContacto) inputNombreContacto.value = '';
+                    if (inputTelefonoContacto) inputTelefonoContacto.value = '';
+                    if (inputDireccionServicio) inputDireccionServicio.value = '';
+                }
+            });
         }
     });
 </script>

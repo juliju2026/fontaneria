@@ -33,6 +33,10 @@ public class ClienteService {
         return clienteRepository.findById(id);
     }
 
+    public Optional<Cliente> buscarPorIdConAverias(Long id) {
+        return clienteRepository.findByIdConAverias(id);
+    }
+
     public Optional<Cliente> buscarPorNif(String nif) { return clienteRepository.findByNif(nif);
     }
     public List<Cliente> buscarClientes(String filtro) {

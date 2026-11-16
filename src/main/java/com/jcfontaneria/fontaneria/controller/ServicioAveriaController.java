@@ -1,5 +1,6 @@
 package com.jcfontaneria.fontaneria.controller;
 
+import com.jcfontaneria.fontaneria.entity.Cliente;
 import com.jcfontaneria.fontaneria.entity.ServicioAveria;
 import com.jcfontaneria.fontaneria.service.CategoriaAveriaService; // Asumiendo que crearas este servicio
 import com.jcfontaneria.fontaneria.service.ClienteService;
@@ -31,8 +32,18 @@ public class ServicioAveriaController {
     }
 
     @GetMapping("/nueva")
-    public String mostrarFormularioNuevaAveria(Model model) {
-        model.addAttribute("servicioAveria", new ServicioAveria());
+    public String mostrarFormularioNuevaAveria(@RequestParam(required = false) Long clienteId, Model model){
+        ServicioAveria averia = new ServicioAveria();
+
+        // Si recibimos un clienteId por parámetro, preseleccionamos ese cliente en la avería
+        if (clienteId != null) {
+            Cliente clientePreseleccionado = clienteService.buscarPorIdConAverias(clienteId).orElse(null);
+            if (clientePreseleccionado != null) {
+                averia.setCliente(clientePreseleccionado);
+            }
+        }
+
+        model.addAttribute("servicioAveria", averia);
         model.addAttribute("clientes", clienteService.listarClientes(null)); // Para asignar un cliente
         model.addAttribute("categorias", categoriaAveriaService.listarTodas()); // Para las etiquetas ManyToMany
         return "averias/form-averia";

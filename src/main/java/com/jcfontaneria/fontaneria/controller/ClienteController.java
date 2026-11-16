@@ -95,4 +95,14 @@ public class ClienteController {
         }
         return "redirect:/clientes";
     }
+
+    @GetMapping("/{id}/averias")
+    public String verHistoricoAverias(@PathVariable Long id, Model model) {
+        Cliente cliente = clienteService.buscarPorIdConAverias(id)
+                .orElseThrow(() -> new IllegalArgumentException("ID de cliente no válido: " + id));
+
+        model.addAttribute("cliente", cliente);
+        model.addAttribute("averias", cliente.getAverias());
+        return "clientes/historico-averias";
+    }
 }
