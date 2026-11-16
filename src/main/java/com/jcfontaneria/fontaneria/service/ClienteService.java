@@ -16,9 +16,13 @@ public class ClienteService {
 
     public List<Cliente> listarClientes(String filtro) {
         if (filtro != null && !filtro.trim().isEmpty()) {
-            return clienteRepository.findByNombreCompletoContainingIgnoreCase(filtro);
+            return clienteRepository.findByFiltroConAverias(filtro);
         }
-        return clienteRepository.findAll();
+        return clienteRepository.findAllConAverias();
+    }
+
+    public List<Cliente> listarClientes() {
+        return clienteRepository.findAllConAverias(); // Usamos el método con JOIN FETCH
     }
 
     public Cliente guardarCliente(Cliente cliente) {

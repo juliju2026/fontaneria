@@ -8,6 +8,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 @Controller
 @RequestMapping("/categorias")
@@ -46,8 +49,17 @@ public class CategoriaAveriaController {
     }
 
     @GetMapping("/eliminar/{id}")
-    public String eliminarCategoria(@PathVariable Long id) {
-        categoriaAveriaService.eliminarCategoria(id);
+    public String eliminarCategoria(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            categoriaAveriaService.eliminarCategoria(id);
+            redirectAttributes.addFlashAttribute("mensajeExito", "Categoría eliminada correctamente.");
+        } catch (DataIntegrityViolationException e) {
+            // Capturamos el error de clave foránea y enviamos un mensaje claro
+            redirectAttributes.addFlashAttribute("mensajeError", "No se puede eliminar esta categoría porque está asociada a una o más averías.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Ocurrió un error inesperado al intentar eliminar la categoría.");
+        }
+
         return "redirect:/categorias";
     }
 }

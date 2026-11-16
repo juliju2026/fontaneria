@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import java.util.List;
 
 @Entity
@@ -25,6 +26,7 @@ public class CategoriaAveria {
     private String descripcion;
 
     // Relación: Una categoría puede estar en muchas averías
+    @ToString.Exclude //para evitar que Lombok lea la colección y rompa la sesión
     @ManyToMany(mappedBy = "categorias")
     private List<ServicioAveria> averias;
 }

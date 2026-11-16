@@ -18,44 +18,54 @@
                 <div class="card-body">
                     <h2 class="mb-4 text-center" th:text="${servicioAveria.id == null} ? 'Registrar Nueva Avería' : 'Editar Avería'">Registro</h2>
 
-                    <form th:action="@{/averias/guardar}" th:object="${servicioAveria}" method="post">
+                    <form th:action="@{/averias/guardar}" th:object="${servicioAveria}" method="post"
+                          onsubmit="document.getElementById('btnGuardar').disabled = true; document.getElementById('btnGuardar').innerText = 'Guardando...';">
 
                         <!-- Campo oculto para el ID -->
                         <input type="hidden" th:field="*{id}" />
 
                         <!-- Cliente asociado -->
                         <div class="mb-3">
-                            <label for="cliente" class="form-label">Cliente Asociado</label>
-                            <select id="cliente" th:field="*{cliente}" class="form-select" required>
+                            <label for="clienteSelect" class="form-label">Cliente Asociado</label>
+                            <select id="clienteSelect" th:field="*{cliente}" class="form-select" required>
                                 <option value="">-- Seleccione un cliente --</option>
                                 <option th:each="c : ${clientes}" th:value="${c.id}" th:text="${c.nombreCompleto}">Cliente</option>
                             </select>
                         </div>
 
+                        <!-- Checkbox para autocompletar dirección teléfono y nombre con datos del cliente -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="usarDatosCliente" checked>
+                            <label class="form-check-label" for="usarDatosCliente">
+                                Cargar los datos de direccion, nombre y telefono registrados del cliente
+                            </label>
+                        </div>
+
                         <!-- Descripción del problema -->
                         <div class="mb-3">
                             <label for="descripcionProblema" class="form-label">Descripción del Problema</label>
-                            <textarea id="descripcionProblema" th:field="*{descripcionProblema}" class="form-control" rows="3" placeholder="Detalle de la avería..."></textarea>
+                            <textarea id="descripcionProblema" th:field="*{descripcionProblema}" class="form-control" required rows="3" placeholder="Detalle de la avería..."></textarea>
                             <div class="text-danger small" th:if="${#fields.hasErrors('descripcionProblema')}" th:errors="*{descripcionProblema}"></div>
                         </div>
 
                         <!-- Dirección del servicio -->
                         <div class="mb-3">
                             <label for="direccionServicio" class="form-label">Dirección del Servicio</label>
-                            <input type="text" id="direccionServicio" th:field="*{direccionServicio}" class="form-control" placeholder="Dirección exacta de la avería">
+                            <input type="text" id="direccionServicio" th:field="*{direccionServicio}" class="form-control" required placeholder="Dirección exacta de la avería.">
                             <div class="text-danger small" th:if="${#fields.hasErrors('direccionServicio')}" th:errors="*{direccionServicio}"></div>
                         </div>
+
 
                         <!-- Datos de contacto en sitio -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="nombreContacto" class="form-label">Persona de Contacto</label>
-                                <input type="text" id="nombreContacto" th:field="*{nombreContacto}" class="form-control" placeholder="Nombre completo">
+                                <input type="text" id="nombreContacto" th:field="*{nombreContacto}" class="form-control" required placeholder="Nombre de persona de contacto en el lugar de la avería">
                                 <div class="text-danger small" th:if="${#fields.hasErrors('nombreContacto')}" th:errors="*{nombreContacto}"></div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="telefonoContacto" class="form-label">Teléfono de Contacto</label>
-                                <input type="text" id="telefonoContacto" th:field="*{telefonoContacto}" class="form-control" placeholder="Teléfono">
+                                <input type="text" id="telefonoContacto" th:field="*{telefonoContacto}" class="form-control" required placeholder="Teléfono de contacto de la persona, en el lugar de la avería.">
                                 <div class="text-danger small" th:if="${#fields.hasErrors('telefonoContacto')}" th:errors="*{telefonoContacto}"></div>
                             </div>
                         </div>
@@ -83,7 +93,7 @@
                         <!-- Botones de acción -->
                         <div class="d-flex justify-content-between mt-4">
                             <a th:href="@{/averias}" class="btn btn-secondary">Cancelar</a>
-                            <button type="submit" class="btn btn-primary">Guardar Avería</button>
+                            <button type="submit" id="btnGuardar" class="btn btn-primary">Guardar Avería</button>
                         </div>
 
                     </form>
@@ -95,5 +105,58 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Script para autocompletar campos con informacion del cliente -->
+<script>
+    const clienteSelect = document.getElementById('clienteSelect');
+    const checkboxDatosCliente = document.getElementById('usarDatosCliente');
+    const inputNombreContacto = document.getElementById('nombreContacto');
+    const inputTelefonoContacto = document.getElementById('telefonoContacto');
+    const inputDireccionServicio = document.getElementById('direccionServicio');
+
+    function cargarDatosCliente() {
+        const clienteId = clienteSelect.value;
+
+        // Si no hay cliente seleccionado o el checkbox no está marcado, no hacemos nada
+        if (!clienteId || !checkboxDatosCliente.checked) {
+            return;
+        }
+
+        // Realizamos la petición al endpoint JSON del cliente
+        fetch(`/clientes/api/${clienteId}`)
+            .then(response => {
+                if (!response.ok) throw new Error('No se pudo obtener el cliente');
+                return response.json();
+            })
+            .then(data => {
+                // Rellenamos los campos con la información obtenida del cliente
+                if (data.nombreCompleto && inputNombreContacto) {
+                    inputNombreContacto.value = data.nombreCompleto;
+                }
+                if (data.telefono && inputTelefonoContacto) {
+                    inputTelefonoContacto.value = data.telefono;
+                }
+                if (data.direccion && inputDireccionServicio) {
+                    inputDireccionServicio.value = data.direccion;
+                }
+            })
+            .catch(error => console.error('Error al cargar los datos del cliente:', error));
+    }
+
+    // Evento 1: Cuando cambia la selección del cliente en el desplegable
+    clienteSelect.addEventListener('change', cargarDatosCliente);
+
+    // Evento 2: Cuando el usuario marca o desmarca el checkbox
+    checkboxDatosCliente.addEventListener('change', function() {
+        if (this.checked) {
+            cargarDatosCliente();
+        } else {
+            // Si desmarca la casilla, limpiamos los campos para que pueda escribir otros datos
+            if (inputNombreContacto) inputNombreContacto.value = '';
+            if (inputTelefonoContacto) inputTelefonoContacto.value = '';
+            if (inputDireccionServicio) inputDireccionServicio.value = '';
+        }
+    });
+</script>
 </body>
 </html>

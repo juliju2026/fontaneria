@@ -14,11 +14,26 @@
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Gestión de Categorías de Avería</h2>
+
         <div>
             <a th:href="@{/}" class="btn btn-outline-dark me-2">Inicio</a>
             <a th:href="@{/categorias/nueva}" class="btn btn-success">+ Nueva Categoría</a>
         </div>
     </div>
+
+    <!-- Alerta de Error (si intenta borrar una categoría en uso) -->
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${mensajeError}">
+        <span th:text="${mensajeError}">Error</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Alerta de Éxito (si se borra o guarda correctamente) -->
+    <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${mensajeExito}">
+        <span th:text="${mensajeExito}">Éxito</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Fin del bloque de alertas -->
 
     <!-- Tabla de Categorías -->
     <div class="card shadow-sm">

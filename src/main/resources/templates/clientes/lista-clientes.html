@@ -50,13 +50,25 @@
                     <td th:text="${cliente.direccion}">Calle Falsa 123</td>
 
                     <!-- Botones de acciones... -->
-                    <td class="text-center">
-                        <a th:href="@{/clientes/editar/{id}(id=${cliente.id})}"
-                           class="btn btn-warning btn-sm me-1">Editar</a>
+                    <td class="text-center" style="width: 140px;">
+                        <div class="d-flex flex-column gap-1">
+                            <!-- Botón Editar -->
+                            <a th:href="@{/clientes/editar/{id}(id=${cliente.id})}"
+                               class="btn btn-warning btn-sm w-100">Editar</a>
 
-                        <a th:href="@{/clientes/eliminar/{id}(id=${cliente.id})}"
-                           class="btn btn-danger btn-sm"
-                           onclick="return confirm('¿Estás seguro de eliminar este cliente?');">Eliminar</a>
+                            <!-- Botón Eliminar (si no tiene histórico) -->
+                            <a th:if="${#lists.isEmpty(cliente.averias)}"
+                               th:href="@{/clientes/eliminar/{id}(id=${cliente.id})}"
+                               class="btn btn-danger btn-sm w-100"
+                               onclick="return confirm('¿Estás seguro de eliminar este cliente?');">Eliminar</a>
+
+                            <!-- Botón Ver Histórico (si tiene averías registradas) -->
+                            <a th:if="${not #lists.isEmpty(cliente.averias)}"
+                               th:href="@{/clientes/{id}/averias(id=${cliente.id})}"
+                               class="btn btn-info btn-sm w-100 text-white">Ver histórico</a>
+                        </div>
+                    </td>
+                        </div>
                     </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(clientes)}">

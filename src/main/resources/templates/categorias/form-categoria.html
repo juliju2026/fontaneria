@@ -18,7 +18,8 @@
                 <div class="card-body p-4">
                     <h2 class="mb-4 text-center" th:text="${categoriaAveria.id == null} ? 'Registrar Categoría' : 'Editar Categoría'">Registro</h2>
 
-                    <form th:action="@{/categorias/guardar}" th:object="${categoriaAveria}" method="post">
+                    <form th:action="@{/categorias/guardar}" th:object="${categoriaAveria}" method="post"
+                          onsubmit="document.getElementById('btnGuardar').disabled = true; document.getElementById('btnGuardar').innerText = 'Guardando...';">
 
                         <!-- Campo oculto imprescindible para la edición -->
                         <input type="hidden" th:field="*{id}" />
@@ -39,10 +40,9 @@
                         <!-- Botones de acción -->
                         <div class="d-flex justify-content-between mt-4">
                             <div>
-                                <a th:href="@{/}" class="btn btn-outline-dark me-2">Inicio</a>
                                 <a th:href="@{/categorias}" class="btn btn-secondary">Cancelar</a>
                             </div>
-                            <button type="submit" class="btn btn-primary">Guardar Categoría</button>
+                            <button type="submit" id="btnGuardar" class="btn btn-primary">Guardar Categoría</button>
                         </div>
 
                     </form>

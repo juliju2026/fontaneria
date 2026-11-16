@@ -16,7 +16,8 @@
         <div class="card-body">
             <h2 class="mb-4 text-center" th:text="${cliente.id == null} ? 'Nuevo Cliente' : 'Editar Cliente'">Nuevo Cliente</h2>
 
-            <form th:action="@{/clientes/guardar}" th:object="${cliente}" method="post">
+            <form th:action="@{/clientes/guardar}" th:object="${cliente}" method="post"
+                  onsubmit="document.getElementById('btnGuardar').disabled = true; document.getElementById('btnGuardar').innerText = 'Guardando...';">
 
                 <!-- Campo oculto vital para diferenciar si estamos creando o editando -->
                 <input type="hidden" th:field="*{id}" />
@@ -64,7 +65,7 @@
                 <!-- Botones de acción -->
                 <div class="d-flex justify-content-between">
                     <a th:href="@{/clientes}" class="btn btn-secondary">Cancelar</a>
-                    <button type="submit" class="btn btn-success">Guardar Cliente</button>
+                    <button type="submit" id="btnGuardar" class="btn btn-success">Guardar Cliente</button>
                 </div>
 
             </form>

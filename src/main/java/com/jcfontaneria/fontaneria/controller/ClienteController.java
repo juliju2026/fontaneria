@@ -4,10 +4,16 @@ import com.jcfontaneria.fontaneria.entity.Cliente;
 import com.jcfontaneria.fontaneria.service.ClienteService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,8 +27,8 @@ public class ClienteController {
 
     // Listar todos los clientes
     @GetMapping
-    public String listarClientes(@RequestParam(value = "filtro", required = false) String filtro, Model model) {
-        List<Cliente> clientes = clienteService.buscarClientes(filtro);
+    public String listarClientes(@RequestParam(required = false) String filtro, Model model) {
+        List<Cliente> clientes = clienteService.listarClientes(filtro);
         model.addAttribute("clientes", clientes);
         model.addAttribute("filtro", filtro); // Para mantener el texto escrito en la caja de búsqueda
         return "clientes/lista-clientes"; // Apunta a la vista HTML en templates/clientes/lista-clientes.html
@@ -33,6 +39,14 @@ public class ClienteController {
     public String mostrarFormularioNuevo(Model model) {
         model.addAttribute("cliente", new Cliente());
         return "clientes/form-cliente"; // Apunta a la vista HTML en templates/clientes/form-cliente.html
+    }
+
+    @GetMapping("/api/{id}")
+    @ResponseBody
+    public ResponseEntity<Cliente> obtenerClienteJson(@PathVariable Long id) {
+        return clienteService.buscarPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // Guardar el cliente (con validación de Jakarta Bean Validation)
@@ -70,10 +84,15 @@ public class ClienteController {
         return "clientes/form-cliente";
     }
 
-    // Eliminar un cliente por su ID
+    // Eliminar un cliente por su ID verifica que no tenga averias asociadas, de lo contrario no deja borrarlo
     @GetMapping("/eliminar/{id}")
-    public String eliminarCliente(@PathVariable Long id) {
-        clienteService.eliminarCliente(id);
+    public String eliminarCliente(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            clienteService.eliminarCliente(id);
+            redirectAttributes.addFlashAttribute("mensajeExito", "Cliente eliminado correctamente.");
+        } catch (DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "No se puede eliminar este cliente porque tiene averías asociadas en el historial.");
+        }
         return "redirect:/clientes";
     }
 }

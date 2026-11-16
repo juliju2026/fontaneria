@@ -1,5 +1,6 @@
 package com.jcfontaneria.fontaneria.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -8,6 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import java.util.List;
 
 @Entity
@@ -43,6 +45,8 @@ public class Cliente {
     private String direccion;
 
     // Relación para mantener el historial de averías del cliente (CRM puro)
+    @ToString.Exclude // <-- ¡Esto evita que Lombok lea la colección en el toString() y lance el LazyException!
+    @JsonIgnore // Jackson ignore esta lista al generar el JSON!
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ServicioAveria> averias;
 }

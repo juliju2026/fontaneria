@@ -3,6 +3,7 @@ package com.jcfontaneria.fontaneria.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,13 +31,14 @@ public class ServicioAveria {
     private String nombreContacto;
 
     @NotBlank(message = "El teléfono de la persona de contacto es obligatoria")
+    @Pattern(regexp = "^\\+?[0-9. ()-]{7,25}$", message = "El formato del teléfono no es válido, minimo 7 digitos") //[0-9. ()-] = permite números del 0 al 9 puntos parentesis y guiones
     private String telefonoContacto;
 
     //TODO a futuro agregar un campo para adjuntar imagenes o vídeos de la avería
 
     // Relación con el tipo de avería (categoria). Un servicio puede tener varios tipos de averias. La relacion es N M
     @NotEmpty(message = "Debe seleccionar al menos una categoría para la avería")
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name= "averia_categoria",
             joinColumns = @JoinColumn(name = "averia_id"),
