@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>ERP & CRM - JC Fontanería</title>
@@ -16,6 +18,11 @@
     <div class="p-5 mb-4 bg-white rounded-3 shadow-sm border">
         <div class="container-fluid py-3">
             <h1 class="display-5 fw-bold text-primary">Panel de Control General</h1>
+
+            <p>Usuario conectado:
+                <strong sec:authentication="name"></strong>
+            </p>
+
             <p class="col-md-8 fs-4 text-secondary mt-2">
                 Bienvenido al sistema de gestión integral para servicios de fontanería. Administra clientes, haz seguimiento de averías y controla el estado operativo y de pagos de forma centralizada.
             </p>
@@ -35,7 +42,7 @@
                         </p>
                     </div>
                     <div class="mt-4">
-                        <a th:href="@{/clientes}" class="btn btn-primary w-100 py-2">Ir a Clientes</a>
+                        <a sec:authorize="hasAuthority('CLIENTES_EDITAR')" th:href="@{/clientes}" class="btn btn-primary w-100 py-2">Ir a Clientes</a>
                     </div>
                 </div>
             </div>
@@ -52,7 +59,7 @@
                         </p>
                     </div>
                     <div class="mt-4">
-                        <a th:href="@{/averias}" class="btn btn-success w-100 py-2">Ir a Averías</a>
+                        <a sec:authorize="hasAuthority('AVERIAS_EDITAR')" th:href="@{/averias}" class="btn btn-success w-100 py-2">Ir a Averías</a>
                     </div>
                 </div>
             </div>

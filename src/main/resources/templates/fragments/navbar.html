@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 <nav th:fragment="menu-superior" class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm mb-4">
     <div class="container">
@@ -9,18 +10,39 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/}">Inicio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/clientes}">Clientes</a>
+                    <a sec:authorize="hasAuthority('CLIENTES_EDITAR')"
+                       class="nav-link" th:href="@{/clientes}">Clientes</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/averias}">Averías</a>
+                    <a sec:authorize="hasAuthority('AVERIAS_EDITAR')"
+                       class="nav-link" th:href="@{/averias}">Averías</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/categorias}">Categorias de Averías</a>
+                    <a sec:authorize="hasAuthority('CATEGORIAS_EDITAR')" class="nav-link" th:href="@{/categorias}">Categorias de Averías</a>
+                </li>
+
+                <li class="nav-item">
+                    <a sec:authorize="hasRole('ADMINISTRADOR')" class="nav-link"
+                       th:href="@{/usuarios}">Gestión de usuarios</a>
+                </li>
+
+                <!-- Indicador de Usuario Conectado -->
+                <li class="nav-item ms-lg-3 my-2 my-lg-0">
+                    <span class="navbar-text text-light small">
+                        Usuario Actual: <strong class="text-warning" sec:authentication="name">Prueba</strong>
+                    </span>
+                </li>
+
+                <!-- Botón de Cerrar Sesión -->
+                <li class="nav-item ms-lg-2">
+                    <form th:action="@{/logout}" method="post" class="m-0">
+                        <button type="submit" class="btn btn-outline-light btn-sm">Cerrar sesión</button>
+                    </form>
                 </li>
             </ul>
         </div>
